@@ -77,19 +77,24 @@ Debería mostrar la ayuda del programa con todas las opciones disponibles.
 
 ## Estructura del Proyecto
 
-```
+```text
 TPFI/
-├── CarGross.py          # Implementación principal de la red ART1
-├── preprocessor.py      # Preprocesamiento de datos RIASEC
-├── run_demo.py          # Demo completo (preprocesamiento + entrenamiento + análisis)
-├── requirements.txt     # Dependencias (numpy)
-├── README.md            # Este manual
-├── career_data.csv      # Dataset original (Kaggle RIASEC)
-└── data/
-    ├── dataset_A.csv    # Dataset A binarizado (~1200 registros)
-    ├── dataset_B.csv    # Dataset B binarizado (~1200 registros)
-    ├── prototypes_A.csv # Prototipos aprendidos del dataset A
-    └── prototypes_B.csv # Prototipos aprendidos del dataset B
+├── src/
+│   ├── CarGross.py          # Implementación principal de la red ART1
+│   └── preprocessor.py      # Preprocesamiento de datos RIASEC (110 bits)
+├── notebooks/
+│   ├── calibracion.py       # Simulación experimental, barrido de rho y demo completo
+│   └── run_demo.py          # Alias ejecutable de la calibración
+├── data/
+│   ├── dataset_A.csv        # Dataset A binarizado (1.200 registros)
+│   ├── dataset_B.csv        # Dataset B binarizado (1.200 registros)
+│   ├── prototypes_A.csv     # Prototipos aprendidos del dataset A
+│   └── prototypes_B.csv     # Prototipos aprendidos del dataset B
+├── career_data.csv          # Dataset psicométrico original
+├── INFORME.md               # Informe final con carátula institucional y fórmulas
+├── MANUAL_REFERENCIA.md     # Manual de referencia, alcances, limitaciones y FAQ
+├── requirements.txt         # Dependencias (numpy)
+└── README.md                # Este documento
 ```
 
 ---
@@ -99,15 +104,15 @@ TPFI/
 ### 1. Preprocesar datos (generar datasets binarizados)
 
 ```bash
-python preprocessor.py --input career_data.csv --output-dir data
+python src/preprocessor.py
 ```
 
-Esto genera `data/dataset_A.csv` y `data/dataset_B.csv`.
+Esto toma `career_data.csv` y genera `data/dataset_A.csv` y `data/dataset_B.csv`.
 
 ### 2. Entrenar la red ART1
 
 ```bash
-python CarGross.py --input data/dataset_A.csv --rho 0.5
+python src/CarGross.py --input data/dataset_A.csv --rho 0.1
 ```
 
 Opciones disponibles:
@@ -122,11 +127,12 @@ Opciones disponibles:
 | `--output`, `-o` | Archivo CSV para guardar prototipos | — |
 | `--quiet`, `-q` | Suprimir progreso por época | — |
 
-### 3. Ejecutar el demo completo
+### 3. Ejecutar la calibración y demo completo
 
 ```bash
-python run_demo.py
+python notebooks/calibracion.py
 ```
+
 
 Ejecuta automáticamente: preprocesamiento → barrido de ρ → entrenamiento en ambos datasets → análisis comparativo.
 

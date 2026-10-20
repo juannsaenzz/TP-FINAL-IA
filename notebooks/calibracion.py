@@ -20,7 +20,9 @@ import os
 import sys
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+sys.path.insert(0, os.path.join(project_root, "src"))
 
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     try:
@@ -36,6 +38,7 @@ from preprocessor import (
     N_BINS,
 )
 from CarGross import ART1, load_binary_csv
+
 
 
 # ---------------------------------------------------------------------------
@@ -179,18 +182,17 @@ def main():
     # ==================================================================
     print_header("PASO 1: Preprocesamiento de career_data.csv")
 
-    csv_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "career_data.csv"
-    )
+    csv_path = os.path.join(project_root, "career_data.csv")
+    if not os.path.exists(csv_path):
+        csv_path = os.path.join(project_root, "archive", "career_data.csv")
 
     if not os.path.exists(csv_path):
         print(f"Error: no se encontró {csv_path}.", file=sys.stderr)
-        print("Ubique career_data.csv en el mismo directorio que este script.")
+        print("Ubique career_data.csv en la raíz del proyecto.")
         sys.exit(1)
 
-    data_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "data"
-    )
+    data_dir = os.path.join(project_root, "data")
+
 
     data_a, data_b, labels_a, labels_b = preprocess(
         csv_path, output_dir=data_dir, split_ratio=0.5, seed=42

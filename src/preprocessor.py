@@ -310,7 +310,14 @@ def main():
     )
 
     args = parser.parse_args()
-    preprocess(args.input, args.output_dir, args.split, args.seed)
+    input_file = args.input
+    output_directory = args.output_dir
+    if not os.path.exists(input_file) and os.path.exists(os.path.join("..", input_file)):
+        input_file = os.path.join("..", input_file)
+    if not os.path.exists(output_directory) and os.path.exists(os.path.join("..", output_directory)):
+        output_directory = os.path.join("..", output_directory)
+
+    preprocess(input_file, output_directory, args.split, args.seed)
 
 
 if __name__ == "__main__":
