@@ -30,6 +30,8 @@ OPCIONES
                     generan pocas categorías generales.
     --L, -l         (Opcional) Parámetro L (> 1.0). Default: 2.0
                     Sesga la búsqueda hacia categorías establecidas.
+    --verbose, -v   (Opcional) Modo detallado. Muestra los rasgos del prototipo
+                    (bits comunes en W_TD) que definen a cada categoría.
     --help, -h      Muestra este manual de ayuda y finaliza la ejecución.
 
 EJEMPLOS DE USO
@@ -38,6 +40,10 @@ EJEMPLOS DE USO
     
     Ejecución con alta vigilancia (más categorías):
         python CarGross.py -i ../data/dataset_B.csv --rho 0.8
+
+    Ejecución con perfilado vocacional detallado:
+        python CarGross.py -i ../data/dataset_A.csv --rho 0.1 --verbose
+
 
 ERRORES COMUNES
     - "No se encontró el archivo": Verifique que la ruta al CSV sea correcta.
@@ -124,6 +130,7 @@ def run():
     parser.add_argument('--input', '-i', type=str)
     parser.add_argument('--rho', '-p', type=float, default=0.5)
     parser.add_argument('--L', '-l', type=float, default=2.0)
+    parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--help', '-h', action='store_true')
     
     try:
@@ -140,12 +147,9 @@ def run():
         print(f"[*] Cargando archivo: {args.input}")
         df = pd.read_csv(args.input)
         
-        if 'Career' in df.columns:
-            X = df.drop(columns=['Career']).values
-            labels = df['Career'].values
-        else:
-            X = df.values
-            labels = None
+        feature_cols = [c for c in df.columns if c != 'Career']
+        X = df[feature_cols].values
+        labels = df['Career'].values if 'Career' in df.columns else None
             
         if not np.array_equal(X, X.astype(bool)):
             raise ValueError("Los datos de entrada no son estrictamente binarios (ceros y unos).")
@@ -161,10 +165,26 @@ def run():
         n_clusters = len(red.W_TD)
         print(f"[+] Ejecución finalizada. Se formaron {n_clusters} categorías (clústeres).")
         
-        # Mostrar resumen simple de distribución
+        # Mostrar resumen con perfilado de categorías
         cluster_counts = pd.Series(clusters).value_counts().sort_index()
+        df_res = pd.DataFrame({'Cluster': clusters})
+        if labels is not None:
+            df_res['Career'] = labels
+            
         for c_id, count in cluster_counts.items():
-            print(f"    - Categoría {c_id}: {count} alumnos")
+            line = f"    - Categoría {c_id}: {count} alumnos"
+            if labels is not None:
+                sub = df_res[df_res['Cluster'] == c_id]['Career'].value_counts()
+                top_careers = ", ".join([f"{car}: {cnt}" for car, cnt in sub.items()])
+                line += f" | Carreras: {top_careers}"
+            print(line)
+            
+            if args.verbose and c_id < len(red.W_TD):
+                shared_traits = [feature_cols[idx] for idx, val in enumerate(red.W_TD[c_id]) if val == 1]
+                if shared_traits:
+                    print(f"      * Rasgos compartidos del prototipo ({len(shared_traits)} bits): {', '.join(shared_traits[:6])}{'...' if len(shared_traits) > 6 else ''}")
+                else:
+                    print("      * Rasgos compartidos: Prototipo generalizado sin bits unánimes")
             
     except Exception as e:
         print("\n[!] OCURRIÓ UN ERROR DURANTE LA EJECUCIÓN:")

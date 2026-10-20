@@ -61,6 +61,11 @@ Ejecución del clasificador con la vigilancia recomendada ($\rho = 0.1$):
 python src/CarGross.py -i data/dataset_A.csv --rho 0.1
 ```
 
+Ejecución con perfilado de rasgos del prototipo (`--verbose`):
+```bash
+python src/CarGross.py -i data/dataset_A.csv --rho 0.1 -v
+```
+
 O sobre el conjunto de validación:
 ```bash
 python src/CarGross.py -i data/dataset_B.csv --rho 0.1

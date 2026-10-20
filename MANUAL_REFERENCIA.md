@@ -8,11 +8,14 @@ Para cumplir con el requisito de instalación sencilla, el proyecto utiliza depe
    `pip install -r requirements.txt`
 
 ## 2. Modo de Correr (Test Demo)
-Para ejecutar una prueba rápida de demostración con el dataset A y la vigilancia por defecto (0.5):
-`python src/CarGross.py -i data/dataset_A.csv`
+Para ejecutar una prueba rápida de demostración con el dataset A y la vigilancia óptima (0.1):
+`python src/CarGross.py -i data/dataset_A.csv --rho 0.1`
+
+Para ver además el desglose detallado de los rasgos de prototipo en común que definen cada categoría:
+`python src/CarGross.py -i data/dataset_A.csv --rho 0.1 -v`
 
 **Salida Esperada:**
-El programa leerá los 100 vectores binarios, inicializará las matrices de la red ART1 y comenzará el proceso de agrupamiento. Finalizará imprimiendo por consola la cantidad total de categorías (clústeres) formadas y un desglose de cuántos alumnos cayeron en cada categoría.
+El programa leerá los 100 vectores binarios, inicializará las matrices de la red ART1 y comenzará el proceso de agrupamiento no supervisado. Finalizará imprimiendo por consola la cantidad total de categorías formadas, la cantidad de alumnos por categoría y la distribución vocacional de carreras. Con `-v`, mostrará además los bits específicos de la matriz Top-Down (`W_TD`) que caracterizan al prototipo del grupo.
 
 ## 3. Alcances y Limitaciones
 **Alcances:**
