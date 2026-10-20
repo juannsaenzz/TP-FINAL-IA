@@ -25,7 +25,7 @@
 
 El presente trabajo aborda la implementación completa, calibración empírica y evaluación psicopedagógica de una red neuronal **ART1 (Adaptive Resonance Theory 1)**, formulada por Stephen Grossberg y Gail Carpenter (1987). El objetivo consiste en conformar perfiles vocacionales no supervisados a partir del dataset psicométrico RIASEC (2400 registros y 11 dimensiones originales), resolviendo el **dilema de estabilidad-plasticidad**.
 
-Se estructuró un pipeline automatizado en Python (`preprocessor.py`, `CarGross.py`, `run_demo.py`) que:
+Se estructuró un pipeline automatizado en Python (`preprocessor.py`, `CarGross.py`, `calibracion.py`) que:
 1. Normaliza y binariza las variables continuas y ordinales en una representación dispersa (*sparse one-hot binning*) de **110 bits**.
 2. Divide el conjunto en dos datasets simétricos e independientes de prueba (**Dataset A** y **Dataset B**, con 1200 registros cada uno).
 3. Evalúa la dinámica del parámetro de vigilancia $\rho$ mediante un barrido experimental exhaustivo ($\rho \in [0.10, 0.90]$).

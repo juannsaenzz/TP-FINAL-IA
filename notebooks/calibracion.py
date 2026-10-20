@@ -1,5 +1,5 @@
 """
-run_demo.py — Complete ART1 Demo on RIASEC Career Data
+calibracion.py — Complete ART1 Calibration & Demo on RIASEC Career Data
 
 Executes the full pipeline:
     1. Preprocess career_data.csv -> binary datasets A and B
@@ -13,7 +13,7 @@ Trabajo Practico Final Integrador — Inteligencia Artificial 2026
 UADER — IDTI Lab de Redes Neuronales — Grupo 6
 
 Usage:
-    python run_demo.py
+    python notebooks/calibracion.py [--full]
 """
 
 import os

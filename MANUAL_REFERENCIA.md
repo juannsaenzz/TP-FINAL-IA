@@ -83,8 +83,7 @@ TPFI/
 │   ├── CarGross.py          # Implementación principal de la red ART1
 │   └── preprocessor.py      # Preprocesamiento de datos RIASEC (110 bits)
 ├── notebooks/
-│   ├── calibracion.py       # Simulación experimental, barrido de rho y demo completo
-│   └── run_demo.py          # Alias ejecutable de la calibración
+│   └── calibracion.py       # Simulación experimental, barrido de rho y calibración completa
 ├── data/
 │   ├── dataset_A.csv        # Dataset A binarizado (1.200 registros)
 │   ├── dataset_B.csv        # Dataset B binarizado (1.200 registros)
@@ -92,9 +91,9 @@ TPFI/
 │   └── prototypes_B.csv     # Prototipos aprendidos del dataset B
 ├── career_data.csv          # Dataset psicométrico original
 ├── INFORME.md               # Informe final con carátula institucional y fórmulas
-├── MANUAL_REFERENCIA.md     # Manual de referencia, alcances, limitaciones y FAQ
+├── MANUAL_REFERENCIA.md     # Manual de referencia técnica, alcances y limitaciones
 ├── requirements.txt         # Dependencias (numpy)
-└── README.md                # Este documento
+└── README.md                # Guía rápida del repositorio
 ```
 
 ---
@@ -143,7 +142,9 @@ Ejecuta automáticamente: preprocesamiento → barrido de ρ → entrenamiento e
 Ejecutar:
 
 ```bash
-python run_demo.py
+python notebooks/calibracion.py
+# O para reporte completo por categoría:
+python notebooks/calibracion.py --full
 ```
 
 El demo realizará:
@@ -192,7 +193,7 @@ Tras el preprocesamiento, cada registro se convierte en un vector binario de **1
 
 ## Salida Esperada
 
-Al ejecutar `python run_demo.py`, la salida incluye:
+Al ejecutar `python notebooks/calibracion.py`, la salida incluye:
 
 1. Información de preprocesamiento (registros cargados, dimensiones)
 2. Tabla de barrido de ρ:
