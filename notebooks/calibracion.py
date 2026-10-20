@@ -334,8 +334,8 @@ def main():
     data/prototypes_B.csv   — Prototipos aprendidos del Dataset B
 
   Para volver a ejecutar con diferentes parámetros:
-    python CarGross.py -i data/dataset_A.csv -r 0.6
-    python CarGross.py -i data/dataset_B.csv -r 0.7 -o mis_resultados.csv
+    python src/CarGross.py -i data/dataset_A.csv -r 0.1
+    python src/CarGross.py -i data/dataset_B.csv -r 0.1 -o data/resultados.csv
 """)
 
 
