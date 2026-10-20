@@ -18,6 +18,7 @@ Usage:
 
 import os
 import sys
+import argparse
 import numpy as np
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -76,9 +77,18 @@ def cluster_label_crosstab(assignments, labels):
     return tab
 
 
-def print_crosstab(tab):
+def print_crosstab(tab, full=False, max_show=5):
     """Print a cluster-vs-label cross-tabulation."""
-    for cid in sorted(tab):
+    if full:
+        cids = sorted(tab.keys())
+        print(f"\n  [Desglose completo: {len(cids)} categorías]")
+    else:
+        # Sort by population descending
+        sorted_by_size = sorted(tab.keys(), key=lambda c: sum(tab[c].values()), reverse=True)
+        cids = sorted_by_size[:max_show]
+        print(f"\n  [Resumen Ejecutivo: Mostrando los {len(cids)} clústeres más poblados de {len(tab)}. Use --full para ver todos]")
+
+    for cid in cids:
         if cid == -1:
             header = "SIN ASIGNAR"
         else:
@@ -110,12 +120,15 @@ def interpret_prototype(prototype, feature_defs=FEATURES, n_bins=N_BINS):
 
 
 def print_prototype_interpretation(net, feature_defs=FEATURES,
-                                   n_bins=N_BINS, max_show=15):
+                                   n_bins=N_BINS, full=False, max_show=5):
     """Print human-readable interpretation of learned prototypes."""
     protos = net.get_prototypes()
-    n_show = min(net.n_committed, max_show)
+    n_show = net.n_committed if full else min(net.n_committed, max_show)
 
-    print(f"\n  Mostrando {n_show} de {net.n_committed} prototipos:\n")
+    if full:
+        print(f"\n  Mostrando los {n_show} prototipos aprendidos:\n")
+    else:
+        print(f"\n  [Resumen: Mostrando los primeros {n_show} prototipos de {net.n_committed}. Use --full para ver todos]\n")
 
     for j in range(n_show):
         interp = interpret_prototype(protos[j], feature_defs, n_bins)
@@ -127,6 +140,7 @@ def print_prototype_interpretation(net, feature_defs=FEATURES,
             print(f"    {fname:25s} -> bins [{bin_str}]")
 
         print()
+
 
 
 # ---------------------------------------------------------------------------
@@ -177,9 +191,14 @@ def rho_sweep(data, rho_values, L=2.0, max_categories=200, verbose=True):
 # ---------------------------------------------------------------------------
 
 def main():
+    parser = argparse.ArgumentParser(description="Simulación y calibración experimental de red ART1.")
+    parser.add_argument("--full", "-f", action="store_true", help="Mostrar desglose exhaustivo de todos los clústeres.")
+    args = parser.parse_args()
+
     # ==================================================================
     # Step 1: Preprocess
     # ==================================================================
+
     print_header("PASO 1: Preprocesamiento de career_data.csv")
 
     csv_path = os.path.join(project_root, "career_data.csv")
@@ -249,11 +268,11 @@ def main():
     # Cross-tabulation
     print_header("Dataset A — Tabla Cruzada: Cluster vs Carrera", "-")
     tab_a = cluster_label_crosstab(assignments_a, labels_a)
-    print_crosstab(tab_a)
+    print_crosstab(tab_a, full=args.full)
 
     # Prototype interpretation
     print_header("Dataset A — Interpretación de Prototipos", "-")
-    print_prototype_interpretation(net_a)
+    print_prototype_interpretation(net_a, full=args.full)
 
     # ==================================================================
     # Step 4: Full training on dataset B with same rho
@@ -276,16 +295,23 @@ def main():
     # Cross-tabulation
     print_header("Dataset B — Tabla Cruzada: Cluster vs Carrera", "-")
     tab_b = cluster_label_crosstab(assignments_b, labels_b)
-    print_crosstab(tab_b)
+    print_crosstab(tab_b, full=args.full)
 
     # Prototype interpretation
     print_header("Dataset B — Interpretación de Prototipos", "-")
-    print_prototype_interpretation(net_b)
+    print_prototype_interpretation(net_b, full=args.full)
 
     # ==================================================================
     # Step 5: Comparison
     # ==================================================================
-    print_header("PASO 5: Análisis Comparativo")
+    print_header("PASO 5: Análisis Comparativo Consolidado")
+
+    purities_a = [100.0 * max(tab_a[cid].values()) / sum(tab_a[cid].values()) for cid in tab_a if cid != -1]
+    purities_b = [100.0 * max(tab_b[cid].values()) / sum(tab_b[cid].values()) for cid in tab_b if cid != -1]
+    avg_p_a = float(np.mean(purities_a)) if purities_a else 0.0
+    avg_p_b = float(np.mean(purities_b)) if purities_b else 0.0
+    p100_a = [cid for cid in tab_a if cid != -1 and max(tab_a[cid].values()) == sum(tab_a[cid].values())]
+    p100_b = [cid for cid in tab_b if cid != -1 and max(tab_b[cid].values()) == sum(tab_b[cid].values())]
 
     print(f"\n  {'Métrica':<30s} {'Dataset A':>12s} {'Dataset B':>12s}")
     print(f"  {'-'*30} {'-'*12} {'-'*12}")
@@ -295,25 +321,37 @@ def main():
           f"{int(np.sum(assignments_a == -1)):>12d} "
           f"{int(np.sum(assignments_b == -1)):>12d}")
     print(f"  {'Vigilancia (rho)':<30s} {optimal_rho:>12.2f} {optimal_rho:>12.2f}")
+    print(f"  {'Pureza promedio de clúster':<30s} {avg_p_a:>11.1f}% {avg_p_b:>11.1f}%")
+    print(f"  {'Clústeres 100% monocolor':<30s} {len(p100_a):>12d} {len(p100_b):>12d}")
 
-    # Dominant career per cluster
-    print(f"\n  Carrera dominante por cluster (Dataset A):")
-    for cid in sorted(tab_a):
-        if cid == -1:
-            continue
-        dominant = max(tab_a[cid], key=tab_a[cid].get)
-        total = sum(tab_a[cid].values())
-        purity = 100.0 * tab_a[cid][dominant] / total
-        print(f"    Cluster {cid:3d}: {dominant:25s} ({purity:.1f}% pureza)")
+    if not args.full:
+        print("\n  Ejemplos de Clústeres con 100% de Pureza Vocacional:")
+        for cid in p100_a:
+            dom = max(tab_a[cid], key=tab_a[cid].get)
+            print(f"    - Dataset A (Cluster {cid:2d}): {dom:18s} ({sum(tab_a[cid].values())} alumnos)")
+        for cid in p100_b:
+            dom = max(tab_b[cid], key=tab_b[cid].get)
+            print(f"    - Dataset B (Cluster {cid:2d}): {dom:18s} ({sum(tab_b[cid].values())} alumnos)")
+        print("\n  [i] Para auditar los 79 clústeres completos, ejecute: python notebooks/calibracion.py --full")
+    else:
+        print(f"\n  Carrera dominante por cluster (Dataset A):")
+        for cid in sorted(tab_a):
+            if cid == -1:
+                continue
+            dominant = max(tab_a[cid], key=tab_a[cid].get)
+            total = sum(tab_a[cid].values())
+            purity = 100.0 * tab_a[cid][dominant] / total
+            print(f"    Cluster {cid:3d}: {dominant:25s} ({purity:.1f}% pureza)")
 
-    print(f"\n  Carrera dominante por cluster (Dataset B):")
-    for cid in sorted(tab_b):
-        if cid == -1:
-            continue
-        dominant = max(tab_b[cid], key=tab_b[cid].get)
-        total = sum(tab_b[cid].values())
-        purity = 100.0 * tab_b[cid][dominant] / total
-        print(f"    Cluster {cid:3d}: {dominant:25s} ({purity:.1f}% pureza)")
+        print(f"\n  Carrera dominante por cluster (Dataset B):")
+        for cid in sorted(tab_b):
+            if cid == -1:
+                continue
+            dominant = max(tab_b[cid], key=tab_b[cid].get)
+            total = sum(tab_b[cid].values())
+            purity = 100.0 * tab_b[cid][dominant] / total
+            print(f"    Cluster {cid:3d}: {dominant:25s} ({purity:.1f}% pureza)")
+
 
     # Save prototypes
     proto_a_path = os.path.join(data_dir, "prototypes_A.csv")
