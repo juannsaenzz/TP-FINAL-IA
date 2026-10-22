@@ -4,7 +4,7 @@ Implementación en Python de una red neuronal ART1 (Adaptive Resonance Theory 1)
 
 **Trabajo Práctico Final Integrador — Inteligencia Artificial 2026**  
 **UADER — Facultad de Ciencia y Tecnología (FCyT) — IDTI Lab de Redes Neuronales**  
-**Docentes:** Dra. Daniela López De Luise & Alejandro Pérez Museo  
+**Docentes:** Dra. Daniela López De Luise & Alejandro Pérez  
 **Grupo 6 — Integrantes:**
 - **Benedetti, Valentino** *(Responsable de Arquitectura)*
 - **Benedetti, Agustín** *(Responsable del Repositorio)*

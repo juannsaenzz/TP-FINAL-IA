@@ -7,7 +7,7 @@ competitive architecture with vigilance-modulated reset mechanism.
 
 Trabajo Practico Final Integrador — Inteligencia Artificial 2026
 UADER — IDTI Lab de Redes Neuronales
-Docentes: Dra. Daniela Lopez De Luise & Alejandro Perez Museo
+Docentes: Dra. Daniela Lopez De Luise & Alejandro Perez
 Grupo 6
 
 Usage:

@@ -9,7 +9,7 @@
 
 - **Materia:** Inteligencia Artificial
 - **Ciclo Lectivo:** 2026
-- **Cátedra:** Dra. Daniela López De Luise — Alejandro Pérez Museo
+- **Cátedra:** Dra. Daniela López De Luise — Alejandro Pérez
 - **Grupo:** Grupo 6
 - **Integrantes:**
   - Benedetti, Valentino *(Responsable de Arquitectura)*
