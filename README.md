@@ -68,7 +68,9 @@ Esto instala únicamente `numpy`.
 3. **Verificar la instalación**:
 
 ```bash
-python CarGross.py --help
+python src/CarGross.py --help
+# o para ver el manual de usuario:
+python src/CarGross.py --man
 ```
 
 Debería mostrar la ayuda del programa con todas las opciones disponibles.
@@ -245,7 +247,7 @@ El parámetro de vigilancia (ρ) está demasiado alto. Con ρ cercano a 1.0, la 
 **Solución**: Bajar ρ. Para este dataset, valores entre 0.3 y 0.6 suelen dar resultados equilibrados.
 
 ```bash
-python CarGross.py -i data/dataset_A.csv -r 0.4
+python src/CarGross.py -i data/dataset_A.csv -r 0.1
 ```
 
 ### 2. ¿Qué hago si aparecen patrones "unassigned" (-1)?

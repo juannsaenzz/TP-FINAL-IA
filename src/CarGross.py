@@ -11,9 +11,10 @@ Docentes: Dra. Daniela Lopez De Luise & Alejandro Perez Museo
 Grupo 6
 
 Usage:
-    python CarGross.py --input data/dataset_A.csv --rho 0.5
-    python CarGross.py --input data/dataset_B.csv --rho 0.7 --output results.csv
-    python CarGross.py --help
+    python src/CarGross.py --input data/dataset_A.csv --rho 0.1
+    python src/CarGross.py --input data/dataset_B.csv --rho 0.1 --output data/prototypes_B.csv
+    python src/CarGross.py --man
+    python src/CarGross.py --help
 """
 
 import numpy as np
@@ -514,8 +515,77 @@ def load_binary_csv(filepath):
 # CLI
 # ---------------------------------------------------------------------------
 
+def print_man_page():
+    """Imprime el manual completo de usuario tipo UNIX man page."""
+    man_text = """
+CARGROSS(1)                   Manual del Usuario                   CARGROSS(1)
+
+NOMBRE
+    CarGross — Red Neuronal ART1 (Carpenter & Grossberg, 1987)
+
+SINOPSIS
+    python src/CarGross.py -i ARCHIVO_CSV [-r RHO] [-L L] [-m MAX_CAT] [-e MAX_EPOCHS] [-o SALIDA] [--quiet] [--man]
+
+DESCRIPCIÓN
+    Agrupamiento no supervisado de patrones binarios basado en la Teoría de
+    Resonancia Adaptativa (ART1). Resuelve el dilema de estabilidad-plasticidad
+    mediante competencia en la capa de reconocimiento (F2), retroalimentación
+    Top-Down hacia la capa de comparación (F1) y un mecanismo de vigilancia
+    (reset) que inhibe categorías no resonantes.
+
+OPCIONES
+    -i, --input ARCHIVO
+        Ruta al archivo CSV de entrada con vectores binarios (0 y 1).
+    -r, --rho VALOR
+        Parámetro de vigilancia en el intervalo [0.0, 1.0]. Por defecto: 0.5.
+        Valores bajos (~0.1) generan categorías amplias (generalistas).
+        Valores altos (~0.8) generan categorías hiper-específicas.
+    --L VALOR
+        Parámetro de elección (L > 1.0). Por defecto: 2.0.
+    -m, --max-categories ENTERO
+        Capacidad máxima de categorías comprometidas en F2. Por defecto: 200.
+    -e, --max-epochs ENTERO
+        Límite máximo de épocas de entrenamiento. Por defecto: 100.
+    -o, --output ARCHIVO
+        Ruta opcional para exportar los vectores prototipo Top-Down a CSV.
+    -q, --quiet
+        Suprime la traza de convergencia época por época.
+    --man
+        Despliega este manual de referencia completo tipo UNIX man page.
+
+DIAGNÓSTICO ANTE CORRIDAS INFRUCTUOSAS
+    1. Demasiadas categorías creadas (> 150):
+       El parámetro de vigilancia (rho) es demasiado alto para la dispersión
+       del dataset. Reduzca rho a un valor menor (ej: rho=0.10).
+    2. Muy pocas categorías (todos los patrones en una o dos categorías):
+       Aumente el parámetro de vigilancia rho para exigir mayor afinidad.
+    3. Patrones sin asignar (-1):
+       Ocurre si el vector es completamente nulo (todo ceros) o si se
+       alcanzó el tope de --max-categories.
+    4. Error "valores no binarios encontrados":
+       El archivo CSV contiene números continuos. Debe ejecutar primero
+       el pipeline de discretización: python src/preprocessor.py.
+    5. Archivo no encontrado o malformado:
+       Verifique que la ruta al CSV exista y que la primera fila contenga
+       los encabezados de columna.
+
+EJEMPLOS
+    python src/CarGross.py -i data/dataset_A.csv -r 0.1
+    python src/CarGross.py -i data/dataset_B.csv -r 0.1 -o data/prototypes_B.csv
+    python src/CarGross.py --man
+
+AUTORES
+    Grupo 6 — UADER FCyT / IDTI Lab de Redes Neuronales (2026)
+"""
+    print(man_text.strip())
+
+
 def main():
     """Command-line interface for CarGross.py."""
+    if "--man" in sys.argv:
+        print_man_page()
+        sys.exit(0)
+
     parser = argparse.ArgumentParser(
         prog="CarGross",
         description=(
@@ -524,14 +594,15 @@ def main():
         ),
         epilog=(
             "Ejemplos:\n"
-            "  python CarGross.py -i data/dataset_A.csv -r 0.5\n"
-            "  python CarGross.py -i data/dataset_B.csv -r 0.7 -o results.csv\n"
+            "  python src/CarGross.py -i data/dataset_A.csv -r 0.1\n"
+            "  python src/CarGross.py -i data/dataset_B.csv -r 0.1 -o data/prototypes_B.csv\n"
+            "  python src/CarGross.py --man\n"
             "\n"
             "Diagnóstico de problemas (corridas infructuosas):\n"
             "  - ¿Demasiadas categorías?   Reducir rho.\n"
             "  - ¿Muy pocas categorías?    Aumentar rho.\n"
             "  - ¿Patrones sin asignar?    Revisar vectores nulos o reducir rho.\n"
-            "  - ¿Valores no binarios?     Ejecutar preprocessor.py primero.\n"
+            "  - ¿Valores no binarios?     Ejecutar python src/preprocessor.py primero.\n"
             "  - ¿Convergencia lenta?      Aumentar --max-epochs.\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -565,9 +636,14 @@ def main():
         "--quiet", "-q", action="store_true",
         help="Suprimir salida detallada época por época."
     )
+    parser.add_argument(
+        "--man", action="store_true",
+        help="Mostrar manual de referencia completo tipo UNIX man page."
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
+        print("\nPara consultar el manual completo de usuario ejecute: python src/CarGross.py --man")
         sys.exit(1)
 
     args = parser.parse_args()
