@@ -2,10 +2,15 @@
 
 Implementación en Python de una red neuronal ART1 (Adaptive Resonance Theory 1), diseñada por Stephen Grossberg y Gail Carpenter (1987), para agrupamiento no supervisado de patrones binarios.
 
-**Trabajo Práctico Final Integrador — Inteligencia Artificial 2026**
-UADER — IDTI Lab de Redes Neuronales
-Docentes: Dra. Daniela López De Luise & Alejandro Pérez Museo
-Grupo 6
+**Trabajo Práctico Final Integrador — Inteligencia Artificial 2026**  
+**UADER — Facultad de Ciencia y Tecnología (FCyT) — IDTI Lab de Redes Neuronales**  
+**Docentes:** Dra. Daniela López De Luise & Alejandro Pérez Museo  
+**Grupo 6 — Integrantes:**
+- **Benedetti, Valentino** *(Responsable de Arquitectura)*
+- **Benedetti, Agustín** *(Responsable del Repositorio)*
+- **Frachia, Franco** *(Responsable del Test)*
+- **Nievas, Juan José** *(Líder / Documentación)*
+- **Sáenz, Juan Ignacio** *(Responsable del Código)*
 
 ---
 
